@@ -53,3 +53,39 @@ def score(i, j):
 
 
 print("Part 2:", max(score(i, j) for i in range(n) for j in range(m)))
+
+def monotonic_stack(row):
+    stack = []
+    res = []
+    for index, item in enumerate(row):
+        while stack and stack[-1][1] < item:
+            stack.pop()
+        if stack:
+            res.append(index - stack[-1][0])
+        else:
+            res.append(index)
+        stack.append((index, item))
+    return res
+
+def solve_part2():
+    left = [monotonic_stack(row) for row in data]
+    right = [monotonic_stack(row[::-1])[::-1] for row in data]
+    up = []
+    down = []
+    for column_index in range(len(data[0])):
+        column = [data[i][column_index] for i in range(len(data))]
+        down.append(monotonic_stack(column))
+        up.append(monotonic_stack(column[::-1])[::-1])
+
+    # transpose
+    up = [*zip(*up)]
+    down = [*zip(*down)]
+
+    ans = 0
+    for i in range(len(data)):
+        for j in range(len(data[0])):
+            ans = max(ans, left[i][j] * right[i][j] * up[i][j] * down[i][j])
+
+    print("Part 2:", ans)
+
+solve_part2()
